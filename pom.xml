@@ -31,9 +31,17 @@
 		<dependency>
 			<groupId>org.springframework.experimental</groupId>
 			<artifactId>spring-native</artifactId>
-			<version>0.10.4-SNAPSHOT</version>
+			<version>0.10.3</version>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>spring-release</id>
+			<name>Spring release</name>
+			<url>https://repo.spring.io/release</url>
+		</repository>
+	</repositories>
 
 	<pluginRepositories>
 		<pluginRepository>
