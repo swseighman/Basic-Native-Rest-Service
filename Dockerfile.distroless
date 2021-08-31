@@ -1,0 +1,7 @@
+FROM frolvlad/alpine-glibc
+
+RUN apk update && apk add libstdc++
+
+EXPOSE 8080
+COPY target/rest-service-complete app
+ENTRYPOINT ["/app"]

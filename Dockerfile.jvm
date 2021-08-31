@@ -1,0 +1,6 @@
+FROM registry.access.redhat.com/ubi8/openjdk-11
+
+EXPOSE 8080
+
+COPY target/rest-service-complete-0.0.1-SNAPSHOT-exec.jar rest-service-complete.jar
+CMD ["java","-jar","rest-service-complete.jar"]
