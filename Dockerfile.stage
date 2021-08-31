@@ -27,18 +27,9 @@ RUN \
     # Install GraalVM Native Image
     gu install native-image;
 
-# RUN mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:jar:0.10.4-SNAPSHOT;
-# COPY src/main/resources/0.10.4-SNAPSHOT /root/.m2/repository/org/springframework/experimental/spring-native/0.10.4-SNAPSHOT
-# COPY src/main/resources/maven-metadata-local.xml /root/.m2/repository/org/springframework/experimental/spring-native/maven-metadata-local.xml
-# COPY src/main/resources/jar /root/.m2/repository/org/springframework/experimental/spring-native/jar
-
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" \
     && mvn --version \
     && native-image --version \
-    # && git clone https://github.com/spring-guides/gs-rest-service \
-    # && cd gs-rest-service/complete \
-    # && mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:pom:0.10.4-SNAPSHOT \
-    # && mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:jar:0.10.4-SNAPSHOT \
     && mvn -Pnative -DskipTests package
 
 FROM frolvlad/alpine-glibc
