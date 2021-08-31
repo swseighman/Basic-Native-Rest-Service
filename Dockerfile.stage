@@ -1,0 +1,56 @@
+#FROM ghcr.io/graalvm/graalvm-ce:java1-21.2.0.1 as graalvm
+#FROM ghcr.io/graalvm/graalvm-ce:latest as graalvm
+#FROM oraclelinux:8-slim as graalvm
+FROM oraclelinux:8.4 as graalvm
+#FROM registry.access.redhat.com/ubi8/ubi-minimal as graalvm
+
+#RUN microdnf -y install wget unzip zip findutils tar
+RUN dnf -y install wget unzip zip findutils tar git
+
+RUN mkdir -p /tmp/ssl \
+    && cp /usr/lib64/libstdc++.so.6.0.25 /tmp/ssl/libstdc++.so.6 \
+    && cp /usr/lib64/libgcc_s.so.1 /tmp/ssl/libgcc_s.so.1 \
+    && cp /usr/lib64/libz.so.1 /tmp/ssl/libz.so.1
+
+COPY . /home/app/restservice
+WORKDIR /home/app/restservice
+
+RUN \
+    # Install SDKMAN
+    curl -s "https://get.sdkman.io" | bash; \
+    source "$HOME/.sdkman/bin/sdkman-init.sh"; \
+    # Install Maven
+    sdk install maven; \
+    # Install GraalVM
+    sdk install java 21.2.0.r11-grl; \
+    #sdk use java 21.2.0.r11-grl; \
+    # Install GraalVM Native Image
+    gu install native-image;
+
+# RUN mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:jar:0.10.4-SNAPSHOT;
+# COPY src/main/resources/0.10.4-SNAPSHOT /root/.m2/repository/org/springframework/experimental/spring-native/0.10.4-SNAPSHOT
+# COPY src/main/resources/maven-metadata-local.xml /root/.m2/repository/org/springframework/experimental/spring-native/maven-metadata-local.xml
+# COPY src/main/resources/jar /root/.m2/repository/org/springframework/experimental/spring-native/jar
+
+RUN source "$HOME/.sdkman/bin/sdkman-init.sh" \
+    && mvn --version \
+    && native-image --version \
+    # && git clone https://github.com/spring-guides/gs-rest-service \
+    # && cd gs-rest-service/complete \
+    # && mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:pom:0.10.4-SNAPSHOT \
+    # && mvn dependency:get -Dartifact=org.springframework.experimental:spring-native:jar:0.10.4-SNAPSHOT \
+    && mvn -Pnative -DskipTests package
+
+FROM frolvlad/alpine-glibc
+#FROM oraclelinux:8.4
+
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/glibc-compat/lib:/opt/libs/lib:/usr/lib:/lib:/lib64
+
+RUN apk -U upgrade \
+    && apk add bash
+COPY --from=graalvm /tmp/ssl/ /
+ENV LD_LIBRARY_PATH /
+
+EXPOSE 8080
+COPY target/rest-service-complete rest-service-complete
+ENTRYPOINT ["/rest-service-complete"]
