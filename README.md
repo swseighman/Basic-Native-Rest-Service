@@ -151,3 +151,8 @@ $ target/gs-rest-service
 
 #### Container Options
 
+Depending on your Linux distribution, you may need to install some additional packages.  For example, in OL/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.
+
+```
+$ sudo dnf group install "Development Tools"
+```
