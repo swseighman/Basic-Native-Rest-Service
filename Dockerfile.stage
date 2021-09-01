@@ -5,8 +5,9 @@
 #FROM registry.access.redhat.com/ubi8/ubi as graalvm
 FROM container-registry.oracle.com/graalvm/enterprise:latest as graalvm
 
-RUN microdnf -y install wget unzip zip findutils tar gcc glibc-devel zlib-devel
+#RUN microdnf -y install wget unzip zip findutils tar gcc glibc-devel zlib-devel
 #RUN dnf -y install wget unzip zip findutils tar git gcc glibc-devel zlib-devel
+RUN microdnf group install "Development Tools"
 
 # RUN mkdir -p /tmp/ssl \
 #     && cp /usr/lib64/libstdc++.so.6.0.25 /tmp/ssl/libstdc++.so.6 \
