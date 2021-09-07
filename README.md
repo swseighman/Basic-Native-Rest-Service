@@ -251,6 +251,15 @@ You can repeat these steps for each container option:
 
 Of course, you'll need to change the tag (`-t`) to reflect the different container images.
 
+```
+$ podman images
+REPOSITORY                        TAG         IMAGE ID      CREATED       SIZE
+localhost/rest-service            mstage      c900d70a0d25  9 hours ago   208 MB
+localhost/rest-service            distroless  b8063db1b900  9 hours ago   125 MB
+localhost/rest-service            native      459f7347240a  10 hours ago  208 MB
+localhost/rest-service            jvm         0e36ed8574d5  10 hours ago  497 MB
+```
+
 **NOTE:** Depending on your Linux distribution, you may need to install some additional packages.  For example, in OL/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  You would add this option in the appropriate Dockerfile.
 
 ```
