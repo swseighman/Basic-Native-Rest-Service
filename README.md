@@ -18,10 +18,12 @@ $ git clone https://github.com/swseighman/Basic-Native-Rest-Service
 Now change directory to the new project:
 
 ```
-$ cd gs-rest-service/complete
+$ cd Basic-Rest-Service
 ```
 
-First, let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container:
+First, let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container.
+
+**NOTE:** You'll need to install docker to create the container.
 
 ```
 $ mvn spring-boot:build-image
@@ -212,9 +214,44 @@ The native executable started in approximately **65 m**s.
 
 Within this repository, there are a few examples of deploying applications in various container environments, from distroless to full OS images.
 
-Multi-stage builds
+```
+$ docker -f Dockerfile.jvm -t rest-service:jvm
+```
 
-Depending on your Linux distribution, you may need to install some additional packages.  For example, in OL/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.
+```
+$ docker run -i --rm -p 8080:8080 localhost/rest-service:jvm
+```
+
+Browse to `localhost:8080/greeting`, where you should see:
+
+```
+{"id":1,"content":"Hello, World!"}
+```
+
+Or, if you're using `podman`:
+
+```
+$ buildah bud -f Dockerfile.jvm -t rest-service:jvm
+```
+
+```
+$ podman run -i --rm -p 8080:8080 localhost/rest-service:jvm
+```
+
+Browse to `localhost:8080/greeting`, where you should see:
+
+```
+{"id":1,"content":"Hello, World!"}
+```
+You can repeat these steps for each container option:
+
+* Dockerfile.jvm
+* Dockerfile.native
+* Dockerfile.stage
+
+Of course, you'll need to change the tag (`-t`) to reflect the different container images.
+
+**NOTE:** Depending on your Linux distribution, you may need to install some additional packages.  For example, in OL/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  You would add this option in the appropriate Dockerfile.
 
 ```
 $ sudo dnf group install "Development Tools"
