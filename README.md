@@ -209,6 +209,132 @@ $ target/gs-rest-service
 ```
 The native executable started in approximately **65 m**s.
 
+#### Native Tests
+
+Running the following command will build and run native tests:
+
+```
+$ mvn -Pnative -Dskip test
+```
+You'll see output displayed similar to this example:
+
+```
+2021-09-21 13:34:51.478  INFO 22357 --- [           main] o.s.nativex.NativeListener               : This application is bootstrapped with code generated with Spring AOT
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v2.5.4)
+
+2021-09-21 13:34:51.479  INFO 22357 --- [           main] c.e.restservice.GreetingControllerTests  : Starting GreetingControllerTests using Java 11.0.12 on sws-ryzen with PID 22357 (started by sseighma in /home/sseighma/code/Basic-Native-Rest-Service)
+2021-09-21 13:34:51.479  INFO 22357 --- [           main] c.e.restservice.GreetingControllerTests  : No active profile set, falling back to default profiles: default
+2021-09-21 13:34:51.528  INFO 22357 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2021-09-21 13:34:51.528  INFO 22357 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2021-09-21 13:34:51.529  INFO 22357 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2021-09-21 13:34:51.530  INFO 22357 --- [           main] c.e.restservice.GreetingControllerTests  : Started GreetingControllerTests in 0.054 seconds (JVM running for 0.059)
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /greeting
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.example.restservice.GreetingController
+           Method = com.example.restservice.GreetingController#greeting(String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"id":1,"content":"Hello, World!"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /greeting
+       Parameters = {name=[Spring Community]}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = com.example.restservice.GreetingController
+           Method = com.example.restservice.GreetingController#greeting(String)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"id":2,"content":"Hello, Spring Community!"}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+com.example.restservice.GreetingControllerTests > noParamGreetingShouldReturnDefaultMessage() SUCCESSFUL
+
+com.example.restservice.GreetingControllerTests > paramGreetingShouldReturnTailoredMessage() SUCCESSFUL
+
+
+Test run finished after 63 ms
+[         2 containers found      ]
+[         0 containers skipped    ]
+[         2 containers started    ]
+[         0 containers aborted    ]
+[         2 containers successful ]
+[         0 containers failed     ]
+[         2 tests found           ]
+[         0 tests skipped         ]
+[         2 tests started         ]
+[         0 tests aborted         ]
+[         2 tests successful      ]
+[         0 tests failed          ]
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:29 min
+[INFO] Finished at: 2021-09-21T13:34:51-04:00
+[INFO] ------------------------------------------------------------------------
+```
 
 #### Container Options
 
