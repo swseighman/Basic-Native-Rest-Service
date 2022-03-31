@@ -1,24 +1,12 @@
-#FROM ghcr.io/graalvm/graalvm-ce:java1-21.2.0.1 as graalvm
-#FROM ghcr.io/graalvm/graalvm-ce:latest as graalvm
-#FROM oraclelinux:8-slim as graalvm
-#FROM oraclelinux:8.4 as graalvm
-#FROM registry.access.redhat.com/ubi8/ubi as graalvm
 FROM container-registry.oracle.com/graalvm/enterprise:latest as graalvm
 
-#RUN microdnf -y install wget unzip zip findutils tar gcc glibc-devel zlib-devel
-#RUN dnf -y install wget unzip zip findutils tar git gcc glibc-devel zlib-devel
-RUN microdnf group install "Development Tools"
-
-# RUN mkdir -p /tmp/ssl \
-#     && cp /usr/lib64/libstdc++.so.6.0.25 /tmp/ssl/libstdc++.so.6 \
-#     && cp /usr/lib64/libgcc_s.so.1 /tmp/ssl/libgcc_s.so.1 \
-#     && cp /usr/lib64/libz.so.1 /tmp/ssl/libz.so.1
+RUN microdnf -y install wget unzip zip findutils tar gcc glibc-devel zlib-devel
 
 COPY . /home/app/restservice
 WORKDIR /home/app/restservice
 
 # Need to download the native-image JAR file from OTN and save it to: src/main/resources  
-COPY src/main/resources/native-image-installable-svm-svmee-java11-linux-amd64-21.2.0.1.jar /home/app/restservice
+COPY src/main/resources/native-image-installable-svm-svmee-java17-linux-amd64-21.3.0.jar /home/app/restservice
 
 RUN \
     # Install SDKMAN
@@ -26,13 +14,7 @@ RUN \
     source "$HOME/.sdkman/bin/sdkman-init.sh"; \
     # Install Maven
     sdk install maven; \
-    # Install GraalVM
-    # sdk install java 21.2.0.r11-grl; \
-    # sdk use java 21.2.0.r11-grl; \
-    # Install GraalVM Native Image
-    gu install -L native-image-installable-svm-svmee-java11-linux-amd64-21.2.0.1.jar;
-
-#ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib64:/lib64
+    gu install -L native-image-installable-svm-svmee-java17-linux-amd64-21.3.0.jar;
 
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" \
     && mvn --version \
@@ -40,17 +22,8 @@ RUN source "$HOME/.sdkman/bin/sdkman-init.sh" \
     && mvn -Pnative -DskipTests package
 
 #FROM frolvlad/alpine-glibc
-#FROM oraclelinux:8.4
-FROM registry.access.redhat.com/ubi8/ubi-minimal
-
-# ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/glibc-compat/lib:/opt/libs/lib:/usr/lib:/lib:/lib64
-
-# RUN apk -U upgrade \
-#     && apk add bash \
-#     && apk add libstdc++
-#COPY --from=graalvm /tmp/ssl/ /
-# ENV LD_LIBRARY_PATH /
+FROM container-registry.oracle.com/os/oraclelinux:8-slim
 
 EXPOSE 8080
-COPY --from=graalvm /home/app/restservice/target/rest-service-complete rest-service-complete
-ENTRYPOINT ["/rest-service-complete"]
+COPY --from=graalvm /home/app/restservice/target/rest-service-demo rest-service-demo
+ENTRYPOINT ["/rest-service-demo"]
