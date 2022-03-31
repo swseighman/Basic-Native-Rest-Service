@@ -5,3 +5,7 @@ RUN apk update && apk add libstdc++
 EXPOSE 8080
 COPY target/rest-service-demo app
 ENTRYPOINT ["/app"]
+
+# Build and run:
+# docker build -f ./Dockerfile.distroless -t localhost/rest-service-demo:distroless
+# docker run --rm -p 8080:8080 localhost/rest-service-demo:distroless

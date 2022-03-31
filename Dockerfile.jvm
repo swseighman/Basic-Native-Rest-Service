@@ -1,11 +1,9 @@
 FROM container-registry.oracle.com/java/openjdk:17-oraclelinux8
-#FROM container-registry.oracle.com/os/oraclelinux:8-slim
 
-# ARG JAR_FILE
 EXPOSE 8080
 COPY  target/rest-service-demo-0.0.1-SNAPSHOT.jar app.jar
 CMD ["java","-jar","app.jar"]
 
-# docker build -f ./Dockerfile.jvm \
-            #  --build-arg JAR_FILE=./target/rest-service-complete-0.0.1-SNAPSHOT-exec.jar \
-            #  -t localhost/rest-service-demo:jvm .
+# Build and run:
+# docker build -f ./Dockerfile.jvm -t localhost/rest-service-demo:jvm
+# docker run --rm -p 8080:8080 localhost/rest-service-demo:jvm
