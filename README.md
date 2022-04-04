@@ -164,7 +164,7 @@ Browse to `localhost:8080/greeting`, where you should see:
 
 Or `curl http://localhost:8080/greeting`.
 
-Next, let's build a native executable:
+We can build a standalone native image executable using the `native` profile which we can add to our custom containers later in this lab. Let's build a native executable:
 
 ```
 $ mvn package -Pnative
