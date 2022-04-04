@@ -6,6 +6,7 @@ GraalVM Enterprise offers features for accelerating the performance of existing 
 
 In the following examples, we'll explore several options for building and deploying a Spring Boot native application, including:
 
+* Using Java 17
 * Using Spring Boot Buildpacks support to generate a lightweight container with a native executable
 * Creating your own custom container running a JAR or native executable
 * Using the GraalVM native image Maven plugin support to generate a native executable
@@ -29,7 +30,7 @@ First, let's build a container with a JAR version of the REST service.  The foll
 $ mvn spring-boot:build-image
 ... <snip>
 [INFO]
-[INFO] Successfully built image 'docker.io/library/rest-service-complete:0.0.1-SNAPSHOT'
+[INFO] Successfully built image 'docker.io/library/rest-service-demo:0.0.1-SNAPSHOT'
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -43,7 +44,7 @@ $ mvn spring-boot:build-image
 Run the container and note the startup time:
 
 ```
-$ docker run --rm -p 8080:8080 rest-service:0.0.1-SNAPSHOT
+$ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
 Setting Active Processor Count to 6
 Calculating JVM memory based on 7397652K available memory
 Calculated JVM Memory Configuration: -XX:MaxDirectMemorySize=10M -Xmx6802612K -XX:MaxMetaspaceSize=83039K -XX:ReservedCodeCacheSize=240M -Xss1M (Total Memory: 7397652K, Thread Count: 250, Loaded Class Count: 12247, Headroom: 0%)
@@ -70,7 +71,7 @@ Picked up JAVA_TOOL_OPTIONS: -Djava.security.properties=/layers/paketo-buildpack
 2021-09-01 03:29:52.152  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 2.769 seconds (JVM running for 3.544)
 ```
 
-The container/app started in approximately **2800 m**s.
+The container/app started in approximately **2800ms**.
 
 If you want to create a **native executable** in a container using `Buildpacks`, add the following to your `pom.xml`:
 
@@ -94,11 +95,11 @@ Then execute the same command:
 $ mvn spring-boot:build-image
 ... <snip>
 [INFO]     [creator]     *** Images (edbdf0ed8de1):
-[INFO]     [creator]           docker.io/library/rest-service-complete:0.0.1-SNAPSHOT
+[INFO]     [creator]           docker.io/library/rest-service-demo:0.0.1-SNAPSHOT
 [INFO]     [creator]     Adding cache layer 'paketo-buildpacks/graalvm:jdk'
 [INFO]     [creator]     Adding cache layer 'paketo-buildpacks/native-image:native-image'
 [INFO]
-[INFO] Successfully built image 'docker.io/library/rest-service-complete:0.0.1-SNAPSHOT'
+[INFO] Successfully built image 'docker.io/library/rest-service-demo:0.0.1-SNAPSHOT'
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -111,8 +112,8 @@ $ mvn spring-boot:build-image
 Now let's run the container:
 
 ```
-$ docker run --rm -p 8080:8080 rest-service:0.0.1-SNAPSHOT
-docker run -p 8080:8080 rest-service-complete:0.0.1-SNAPSHOT
+$ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
+docker run -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
 2021-09-01 03:43:13.817  INFO 1 --- [           main] o.s.nativex.NativeListener               : This application is bootstrapped with code generated with Spring AOT
 
   .   ____          _            __ _ _
@@ -136,7 +137,7 @@ docker run -p 8080:8080 rest-service-complete:0.0.1-SNAPSHOT
 
 **NOTE:** You can also use `podman`.
 
-The native executable container/app started in approximately **85 m**s.
+The native executable container/app started in approximately **85ms**.
 
 If you prefer `docker-compose`, you can create a `docker-compose.yml` at the root of the project with the following content:
 
@@ -144,7 +145,7 @@ If you prefer `docker-compose`, you can create a `docker-compose.yml` at the roo
 version: '3.1'
 services:
   rest-service:
-    image: rest-service:0.0.1-SNAPSHOT
+    image: rest-service-demo:0.0.1-SNAPSHOT
     ports:
       - "8080:8080"
 ```
@@ -166,28 +167,61 @@ Or `curl http://localhost:8080/greeting`.
 Next, let's build a native executable:
 
 ```
-$ mvn -Pnative -DskipTests package
+$ mvn package -Pnative
 ... <snip>
-[rest-service-complete:20670]        image:  11,877.25 ms,  6.95 GB
-[rest-service-complete:20670]        write:   6,180.24 ms,  6.95 GB
-[rest-service-complete:20670]      [total]: 155,481.29 ms,  6.95 GB
-# Printing build artifacts to: /Users/sseighma/code/spring/gs-rest-service/gs-rest-service/target/rest-service-complete.build_artifacts.txt
+[3/7] Building universe...                                                                               (3.1s @ 3.45GB)
+[4/7] Parsing methods...      [**]                                                                       (2.1s @ 5.44GB)
+[5/7] Inlining methods...     [*****]                                                                    (4.3s @ 3.22GB)
+[6/7] Compiling methods...    [*******]                                                                 (56.3s @ 5.37GB)
+[7/7] Creating image...                                                                                  (5.8s @ 3.83GB)
+  47.77MB (54.75%) for code area:   43,955 compilation units
+  32.69MB (37.47%) for image heap:  10,733 classes and 497,786 objects
+   6.78MB ( 7.78%) for other data
+  87.25MB in total
+------------------------------------------------------------------------------------------------------------------------
+Top 10 packages in code area:                               Top 10 object types in image heap:
+   2.68MB com.oracle.svm.core.reflect                         14.83MB byte[] for general heap data
+   2.12MB sun.security.ssl                                     2.78MB byte[] for java.lang.String
+   1.78MB java.util                                            2.60MB java.lang.Class
+   1.21MB com.sun.crypto.provider                              2.42MB java.lang.String
+ 933.73KB java.util.concurrent                                 1.02MB java.util.LinkedHashMap
+ 860.20KB sun.security.x509                                  653.52KB java.lang.reflect.Method
+ 808.99KB java.lang                                          498.91KB s.r.a.AnnotatedTypeFactory$AnnotatedTypeBaseImpl
+ 790.88KB org.apache.tomcat.util.net                         491.60KB byte[] for method metadata
+ 786.20KB org.apache.catalina.core                           423.34KB java.util.HashMap$Node
+ 749.99KB java.lang.invoke                                   406.38KB java.util.concurrent.ConcurrentHashMap$Node
+      ... 642 additional packages                                 ... 3197 additional object types
+                                           (use GraalVM Dashboard to see all)
+------------------------------------------------------------------------------------------------------------------------
+                        11.1s (8.4% of total time) in 67 GCs | Peak RSS: 8.66GB | CPU load: 9.39
+------------------------------------------------------------------------------------------------------------------------
+Produced artifacts:
+ /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo (executable)
+ /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo.build_artifacts.txt
+========================================================================================================================
+Finished generating 'rest-service-demo' in 2m 12s.
 [INFO]
-[INFO] --- spring-boot-maven-plugin:2.5.4:repackage (repackage) @ rest-service-complete ---
-[INFO] Attaching repackaged archive /Users/sseighma/code/spring/gs-rest-service/gs-rest-service/target/rest-service-complete-0.0.1-SNAPSHOT-exec.jar with classifier exec
+[INFO] --- spring-boot-maven-plugin:2.6.5:repackage (repackage) @ rest-service-demo ---
+[INFO] Attaching repackaged archive /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo-0.0.1-SNAPSHOT-exec.jar with classifier exec
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  02:54 min
-[INFO] Finished at: 2021-08-31T22:59:59-04:00
-[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  04:53 min
+[INFO] Finished at: 2022-04-04T11:26:00-04:00
+[INFO] --------------------------------------------------------------------------
 ```
+
+>**NOTE:** Depending on your OS distribution, you may need to install some additional packages.  For example, with Oracle Linux/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  *You would also add this option in the appropriate Dockerfile.*
+
+>```
+>$ sudo dnf group install "Development Tools"
+>```
 
 To run the native executable application, execute the following:
 
 ```
-$ target/gs-rest-service
-2021-08-31 23:01:44.180  INFO 20826 --- [           main] o.s.nativex.NativeListener               : This application is bootstrapped with code generated with Spring AOT
+$ target/rest-service-demo
+2022-04-04 11:27:58.049  INFO 27055 --- [           main] o.s.nativex.NativeListener               : AOT mode enabled
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -195,26 +229,28 @@ $ target/gs-rest-service
  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v2.5.4)
+ :: Spring Boot ::                (v2.6.5)
 
-2021-08-31 23:01:44.181  INFO 20826 --- [           main] c.e.restservice.RestServiceApplication   : Starting RestServiceApplication v0.0.1-SNAPSHOT using Java 11.0.12 with PID 20826 (/Users/code/spring/gs-rest-service/gs-rest-service/target/rest-service-complete started by user in /Users/code/spring/gs-rest-service/gs-rest-service)
-2021-08-31 23:01:44.181  INFO 20826 --- [           main] c.e.restservice.RestServiceApplication   : No active profile set, falling back to default profiles: default
-2021-08-31 23:01:44.208  INFO 20826 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2021-08-31 23:01:44.208  INFO 20826 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2021-08-31 23:01:44.208  INFO 20826 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
-2021-08-31 23:01:44.213  INFO 20826 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2021-08-31 23:01:44.213  INFO 20826 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 31 ms
-2021-08-31 23:01:44.226  INFO 20826 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
-2021-08-31 23:01:44.226  INFO 20826 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.065 seconds (JVM running for 0.066)
+2022-04-04 11:27:58.050  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Starting RestServiceApplication v0.0.1-SNAPSHOT using Java 17.0.2 on sws-ryzen with PID 27055 (/home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo started by sseighma in /home/sseighma/code/Basic-Native-Rest-Service)
+2022-04-04 11:27:58.050  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : No active profile set, falling back to 1 default profile: "default"
+2022-04-04 11:27:58.056  INFO 27055 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
+2022-04-04 11:27:58.057  INFO 27055 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-04-04 11:27:58.057  INFO 27055 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.60]
+2022-04-04 11:27:58.059  INFO 27055 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-04-04 11:27:58.059  INFO 27055 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 9 ms
+2022-04-04 11:27:58.060  WARN 27055 --- [           main] i.m.c.i.binder.jvm.JvmGcMetrics          : GC notifications will not be available because MemoryPoolMXBeans are not provided by the JVM
+2022-04-04 11:27:58.074  INFO 27055 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoint(s) beneath base path '/actuator'
+2022-04-04 11:27:58.076  INFO 27055 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+2022-04-04 11:27:58.076  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.03 seconds (JVM running for 0.032)
 ```
-The native executable started in approximately **65 m**s.
+The native executable started in approximately **32 ms**.
 
 #### Native Tests
 
 Running the following command will build and run native tests:
 
 ```
-$ mvn -Pnative -Dskip test
+$ mvn -Pnative test
 ```
 You'll see output displayed similar to this example:
 
@@ -338,14 +374,16 @@ Test run finished after 63 ms
 
 #### Container Options
 
-Within this repository, there are a few examples of deploying applications in various container environments, from distroless to full OS images.
+Within this repository, there are a few examples of deploying applications in various container environments, from distroless to full OS images.  Choose the appropriate version for your use case and build the images.
+
+For example, to build the JAR version:
 
 ```
-$ docker -f Dockerfile.jvm -t rest-service:jvm
+$ docker build -f Dockerfile.jvm -t localhost/rest-service-demo:jvm
 ```
 
 ```
-$ docker run -i --rm -p 8080:8080 localhost/rest-service:jvm
+$ docker run -i --rm -p 8080:8080 localhost/rest-service-demo:jvm
 ```
 
 Browse to `localhost:8080/greeting`, where you should see:
@@ -357,11 +395,11 @@ Browse to `localhost:8080/greeting`, where you should see:
 Or, if you're using `podman`:
 
 ```
-$ buildah bud -f Dockerfile.jvm -t rest-service:jvm
+$ buildah bud -f Dockerfile.jvm -t localhost/rest-service-demo:jvm
 ```
 
 ```
-$ podman run -i --rm -p 8080:8080 localhost/rest-service:jvm
+$ podman run -i --rm -p 8080:8080 localhost/rest-service-demo:jvm
 ```
 
 Browse to `localhost:8080/greeting`, where you should see:
@@ -374,20 +412,44 @@ You can repeat these steps for each container option:
 * Dockerfile.jvm
 * Dockerfile.native
 * Dockerfile.stage
+* Dockerfile.distroless
 
 Of course, you'll need to change the tag (`-t`) to reflect the different container images.
 
 ```
-$ podman images
-REPOSITORY                        TAG         IMAGE ID      CREATED       SIZE
-localhost/rest-service            mstage      c900d70a0d25  9 hours ago   208 MB
-localhost/rest-service            distroless  b8063db1b900  9 hours ago   125 MB
-localhost/rest-service            native      459f7347240a  10 hours ago  208 MB
-localhost/rest-service            jvm         0e36ed8574d5  10 hours ago  497 MB
+$ docker images
+localhost/rest-service-demo                       distroless       a3b1cc5886b8  3 days ago    119 MB
+localhost/rest-service-demo                       native           2b0698c7b409  3 days ago    281 MB
+localhost/rest-service-demo                       jvm              c1f07f1e563e  3 days ago    691 MB
+localhost/rest-service-demo                       stage            dbae9b9333a7  3 days ago    281 MB
 ```
 
-**NOTE:** Depending on your Linux distribution, you may need to install some additional packages.  For example, in OL/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  You would add this option in the appropriate Dockerfile.
+Also, you can choose to compress the native image executable using the [upx](https://upx.github.io/) utility which will reduce your container size but have little impact on startup performance.
+
+For example:
 
 ```
-$ sudo dnf group install "Development Tools"
+$ upx -7 -k target/rest-service-demo
+Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2020
+UPX 3.96        Markus Oberhumer, Laszlo Molnar & John Reiser   Jan 23rd 2020
+
+        File size         Ratio      Format      Name
+   --------------------   ------   -----------   -----------
+  84541616 ->  26604004   31.47%   linux/amd64   rest-service-demo
+
+Packed 1 file.
+```
+Using `upx` we reduced the native image executable size by ~31% (from **81 M** to **26 M**):
+```
+-rwxrwxr-x 1 sseighma sseighma  26M Apr  4 10:44 rest-service-demo
+-rwxrwxr-x 1 sseighma sseighma  81M Apr  4 10:44 rest-service-demo.~
+```
+
+Our native image container is now **140 MB** (versus the uncompressed version at **281 MB**):
+
+
+```
+$ docker images
+localhost/rest-service-demo                       native           ff77aee72e96  8 seconds ago  140 MB
 ```
