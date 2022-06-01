@@ -22,7 +22,7 @@ Now change directory to the new project:
 $ cd Basic-Rest-Service
 ```
 
-> **NOTE:** There is a build script (`build.sh`) provided to build the project, create native image executables and build the container images.  Simply run:
+> **NOTE:** As an alternative to executing the following commands manually, there is a build script (`build.sh`) provided to build the project, create native image executables and build the container images.  Simply run:
 >```
 >./build.sh
 >```
