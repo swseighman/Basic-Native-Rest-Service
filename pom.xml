@@ -47,13 +47,20 @@
 			<scope>runtime</scope>
 		</dependency>
 
+<<<<<<< HEAD
 	    <dependency>
+=======
+		<dependency>
+>>>>>>> 0e7d805412007cd7c6214a33f2a070e1fbc0fee1
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-launcher</artifactId>
 			<version>1.8.2</version>
 			<scope>test</scope>
 		</dependency>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0e7d805412007cd7c6214a33f2a070e1fbc0fee1
 	</dependencies>
 
 	<repositories>
