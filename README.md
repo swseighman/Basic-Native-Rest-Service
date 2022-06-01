@@ -9,7 +9,7 @@ In the following examples, we'll explore several options for building and deploy
 * Using Java 17
 * Using Spring Boot Buildpacks support to generate a lightweight container with a native executable
 * Creating your own custom container running a JAR or native executable
-* Using the GraalVM native image Maven plugin support to generate a native executable
+* Using the GraalVM native image Maven and Gradle plugins support to generate a native executable
 
 Let's begin by cloning the demo repository:
 
@@ -22,7 +22,17 @@ Now change directory to the new project:
 $ cd Basic-Rest-Service
 ```
 
-First, let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container.
+To build the project, execute:
+```
+mvn package
+```
+
+>If you're using **Gradle**, execute the following command to build the application:
+>```
+>./gradlew build
+>```
+
+Let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container.
 
 **NOTE:** You'll need to install docker to create the container.
 
@@ -109,6 +119,11 @@ $ mvn spring-boot:build-image
 [INFO] ------------------------------------------------------------------------
 ```
 
+>If you're using **Gradle**, execute the following command to build the container using Buildpacks:
+>```
+>./gradlew bootBuildImage
+>```
+
 Now let's run the container:
 
 ```
@@ -134,8 +149,6 @@ docker run -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
 2021-09-01 03:43:13.894  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
 2021-09-01 03:43:13.894  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.085 seconds (JVM running for 0.087)
 ```
-
-**NOTE:** You can also use `podman`.
 
 The native executable container/app started in approximately **85ms**.
 
@@ -165,57 +178,17 @@ Browse to `localhost:8080/greeting`, where you should see:
 Or `curl http://localhost:8080/greeting`.
 
 
->If you're using **Gradle**, execute the following command to build the application:
->```
->./gradlew build
->```
-
 We can build a standalone native image executable using the `native` profile which we can add to our custom containers later in this lab. Let's build a native executable:
 
 ```
-$ mvn package -Pnative
-... <snip>
-[3/7] Building universe...                                                                               (3.1s @ 3.45GB)
-[4/7] Parsing methods...      [**]                                                                       (2.1s @ 5.44GB)
-[5/7] Inlining methods...     [*****]                                                                    (4.3s @ 3.22GB)
-[6/7] Compiling methods...    [*******]                                                                 (56.3s @ 5.37GB)
-[7/7] Creating image...                                                                                  (5.8s @ 3.83GB)
-  47.77MB (54.75%) for code area:   43,955 compilation units
-  32.69MB (37.47%) for image heap:  10,733 classes and 497,786 objects
-   6.78MB ( 7.78%) for other data
-  87.25MB in total
-------------------------------------------------------------------------------------------------------------------------
-Top 10 packages in code area:                               Top 10 object types in image heap:
-   2.68MB com.oracle.svm.core.reflect                         14.83MB byte[] for general heap data
-   2.12MB sun.security.ssl                                     2.78MB byte[] for java.lang.String
-   1.78MB java.util                                            2.60MB java.lang.Class
-   1.21MB com.sun.crypto.provider                              2.42MB java.lang.String
- 933.73KB java.util.concurrent                                 1.02MB java.util.LinkedHashMap
- 860.20KB sun.security.x509                                  653.52KB java.lang.reflect.Method
- 808.99KB java.lang                                          498.91KB s.r.a.AnnotatedTypeFactory$AnnotatedTypeBaseImpl
- 790.88KB org.apache.tomcat.util.net                         491.60KB byte[] for method metadata
- 786.20KB org.apache.catalina.core                           423.34KB java.util.HashMap$Node
- 749.99KB java.lang.invoke                                   406.38KB java.util.concurrent.ConcurrentHashMap$Node
-      ... 642 additional packages                                 ... 3197 additional object types
-                                           (use GraalVM Dashboard to see all)
-------------------------------------------------------------------------------------------------------------------------
-                        11.1s (8.4% of total time) in 67 GCs | Peak RSS: 8.66GB | CPU load: 9.39
-------------------------------------------------------------------------------------------------------------------------
-Produced artifacts:
- /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo (executable)
- /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo.build_artifacts.txt
-========================================================================================================================
-Finished generating 'rest-service-demo' in 2m 12s.
-[INFO]
-[INFO] --- spring-boot-maven-plugin:2.6.5:repackage (repackage) @ rest-service-demo ---
-[INFO] Attaching repackaged archive /home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo-0.0.1-SNAPSHOT-exec.jar with classifier exec
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  04:53 min
-[INFO] Finished at: 2022-04-04T11:26:00-04:00
-[INFO] --------------------------------------------------------------------------
+mvn package -Pnative
 ```
+>If you're using **Gradle**, execute the following command to build the native image executable:
+>```
+>./gradlew nativeCompile
+>```
+
+The result will produce a native image executable.
 
 >**NOTE:** Depending on your OS distribution, you may need to install some additional packages.  For example, with Oracle Linux/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  *You would also add this option in the appropriate Dockerfile.*
 
@@ -227,33 +200,14 @@ To run the native executable application, execute the following:
 
 ```
 $ target/rest-service-demo
-2022-04-04 11:27:58.049  INFO 27055 --- [           main] o.s.nativex.NativeListener               : AOT mode enabled
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v2.6.5)
-
-2022-04-04 11:27:58.050  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Starting RestServiceApplication v0.0.1-SNAPSHOT using Java 17.0.2 on sws-ryzen with PID 27055 (/home/sseighma/code/Basic-Native-Rest-Service/target/rest-service-demo started by sseighma in /home/sseighma/code/Basic-Native-Rest-Service)
-2022-04-04 11:27:58.050  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : No active profile set, falling back to 1 default profile: "default"
-2022-04-04 11:27:58.056  INFO 27055 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2022-04-04 11:27:58.057  INFO 27055 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-04-04 11:27:58.057  INFO 27055 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.60]
-2022-04-04 11:27:58.059  INFO 27055 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-04-04 11:27:58.059  INFO 27055 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 9 ms
-2022-04-04 11:27:58.060  WARN 27055 --- [           main] i.m.c.i.binder.jvm.JvmGcMetrics          : GC notifications will not be available because MemoryPoolMXBeans are not provided by the JVM
-2022-04-04 11:27:58.074  INFO 27055 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 4 endpoint(s) beneath base path '/actuator'
-2022-04-04 11:27:58.076  INFO 27055 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+<snip> ...
 2022-04-04 11:27:58.076  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.03 seconds (JVM running for 0.032)
 ```
-The native executable started in approximately **32 ms**.
+The native executable started in approximately **30 ms**.
 
->If you're using **Gradle**, execute the following command to build the native image executable:
+>If you're using **Gradle**, execute the following command:
 >```
->./gradlew nativeCompile
+>build/native/nativeCompile/rest-service-demo
 >```
 
 #### Native Tests
@@ -263,6 +217,12 @@ Running the following command will build and run native tests:
 ```
 $ mvn -Pnative test
 ```
+
+>If you're using **Gradle**, execute the following command to build the native image executable:
+>```
+>./gradlew nativeTest
+>```
+
 You'll see output displayed similar to this example:
 
 ```
@@ -383,12 +343,7 @@ Test run finished after 63 ms
 [INFO] ------------------------------------------------------------------------
 ```
 
->If you're using **Gradle**, execute the following command to build the native image executable:
->```
->./gradlew nativeTest
->```
-
-#### Building a Static Native Image
+#### Building a Static Native Image (x64 Linux only)
 
 See [instructions](https://docs.oracle.com/en/graalvm/enterprise/22/docs/reference-manual/native-image/StaticImages/) for building and installing the required libraries.
 
