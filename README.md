@@ -386,8 +386,6 @@ You can repeat these steps for each container option:
 
 There is also a `build-containers.sh` script provided to build the container images.
 
-Of course, you'll need to change the tag (`-t`) to reflect the different container images.
-
 ```
 $ docker images
 localhost/rest-service-demo         distroless       a3b1cc5886b8  3 days ago     49 MB
