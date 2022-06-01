@@ -22,6 +22,12 @@ Now change directory to the new project:
 $ cd Basic-Rest-Service
 ```
 
+> **NOTE:** There is a build script (`build.sh`) provided to build the project, create native image executables and build the container images.  Simply run:
+>```
+>./build.sh
+>```
+> Depending on your choice of build tools (Maven/Gradle), you will need to edit the script and comment/uncomment lines to accommodate your use case.
+
 To build the project, execute:
 ```
 mvn package
@@ -34,7 +40,7 @@ mvn package
 
 Let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container.
 
-**NOTE:** You'll need to install docker to create the container.
+>**NOTE:** You'll need to install `docker` or `podman` to create the containers.
 
 ```
 $ mvn spring-boot:build-image
@@ -49,35 +55,13 @@ $ mvn spring-boot:build-image
 [INFO] Finished at: 2021-08-31T22:16:46-04:00
 [INFO] ------------------------------------------------------------------------
 ```
-**NOTE:** During the native compilation phase (throughout these examples), you will see many *WARNING: Could not register reflection metadata messages*, they are expected and will be removed in a future version.
+>**NOTE:** During the native compilation phase (throughout these examples), you will see many *WARNING: Could not register reflection metadata messages*, they are expected and will be removed in a future version.
 
 Run the container and note the startup time:
 
 ```
 $ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
-Setting Active Processor Count to 6
-Calculating JVM memory based on 7397652K available memory
-Calculated JVM Memory Configuration: -XX:MaxDirectMemorySize=10M -Xmx6802612K -XX:MaxMetaspaceSize=83039K -XX:ReservedCodeCacheSize=240M -Xss1M (Total Memory: 7397652K, Thread Count: 250, Loaded Class Count: 12247, Headroom: 0%)
-Adding 129 container CA certificates to JVM truststore
-Spring Cloud Bindings Enabled
-Picked up JAVA_TOOL_OPTIONS: -Djava.security.properties=/layers/paketo-buildpacks_bellsoft-liberica/java-security-properties/java-security.properties -XX:+ExitOnOutOfMemoryError -XX:ActiveProcessorCount=6 -XX:MaxDirectMemorySize=10M -Xmx6802612K -XX:MaxMetaspaceSize=83039K -XX:ReservedCodeCacheSize=240M -Xss1M -Dorg.springframework.cloud.bindings.boot.enable=true
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v2.5.4)
-
-2021-09-01 03:29:50.111  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Starting RestServiceApplication v0.0.1-SNAPSHOT using Java 11.0.12 on f2f1a297ff62 with PID 1 (/workspace/BOOT-INF/classes started by cnb in /workspace)
-2021-09-01 03:29:50.115  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : No active profile set, falling back to default profiles: default
-2021-09-01 03:29:51.488  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2021-09-01 03:29:51.508  INFO 1 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2021-09-01 03:29:51.509  INFO 1 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
-2021-09-01 03:29:51.618  INFO 1 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2021-09-01 03:29:51.618  INFO 1 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1406 ms
-2021-09-01 03:29:52.139  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+... <snip>
 2021-09-01 03:29:52.152  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 2.769 seconds (JVM running for 3.544)
 ```
 
@@ -128,25 +112,7 @@ Now let's run the container:
 
 ```
 $ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
-docker run -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
-2021-09-01 03:43:13.817  INFO 1 --- [           main] o.s.nativex.NativeListener               : This application is bootstrapped with code generated with Spring AOT
-
-  .   ____          _            __ _ _
- /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
-( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
- \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
-  '  |____| .__|_| |_|_| |_\__, | / / / /
- =========|_|==============|___/=/_/_/_/
- :: Spring Boot ::                (v2.5.4)
-
-2021-09-01 03:43:13.821  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Starting RestServiceApplication using Java 11.0.12 on afd146262820 with PID 1 (/workspace/com.example.restservice.RestServiceApplication started by cnb in /workspace)
-2021-09-01 03:43:13.821  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : No active profile set, falling back to default profiles: default
-2021-09-01 03:43:13.859  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8080 (http)
-2021-09-01 03:43:13.860  INFO 1 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2021-09-01 03:43:13.860  INFO 1 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.52]
-2021-09-01 03:43:13.864  INFO 1 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2021-09-01 03:43:13.864  INFO 1 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 42 ms
-2021-09-01 03:43:13.894  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8080 (http) with context path ''
+... <snip>
 2021-09-01 03:43:13.894  INFO 1 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.085 seconds (JVM running for 0.087)
 ```
 
@@ -192,7 +158,7 @@ mvn package -Pnative
 The result will produce a native image executable.
 
 >**NOTE:** Depending on your OS distribution, you may need to install some additional packages.  For example, with Oracle Linux/RHEL/Fedora distributions, I recommend installing the `Development Tools` to cover all of the dependencies you'll need to compile a native executable.  *You would also add this option in the appropriate Dockerfile.*
-
+>
 >```
 >$ sudo dnf group install "Development Tools"
 >```
@@ -201,7 +167,7 @@ To run the native executable application, execute the following:
 
 ```
 $ target/rest-service-demo
-<snip> ...
+...<snip>
 2022-04-04 11:27:58.076  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.03 seconds (JVM running for 0.032)
 ```
 The native executable started in approximately **30 ms**.
@@ -357,6 +323,12 @@ Then execute:
 mvn package -Pstatic
 ```
 
+To run the static native executable application, execute the following:
+```
+target/rest-service-demo-static
+```
+
+
 #### Container Options
 
 Within this repository, there are a few examples of deploying applications in various container environments, from distroless to full OS images.  Choose the appropriate version for your use case and build the images.
@@ -387,6 +359,7 @@ You can repeat these steps for each container option:
 
 There is also a `build-containers.sh` script provided to build the container images.
 
+Notice the variation in container image size for each of the options:
 ```
 $ docker images
 localhost/rest-service-demo         distroless       a3b1cc5886b8  3 days ago     49 MB
@@ -412,13 +385,13 @@ UPX 3.96        Markus Oberhumer, Laszlo Molnar & John Reiser   Jan 23rd 2020
 
 Packed 1 file.
 ```
-Using `upx` we reduced the native image executable size by ~31% (from **81 M** to **26 M**):
+Using `upx` we reduced the native image executable size by ~32% (from **73 M** to **24 M**):
 ```
--rwxrwxr-x 1 sseighma sseighma  26M Apr  4 10:44 rest-service-demo
--rwxrwxr-x 1 sseighma sseighma  81M Apr  4 10:44 rest-service-demo.~
+-rwxrwxr-x 1 sseighma sseighma  24M Apr  4 10:44 rest-service-demo
+-rwxrwxr-x 1 sseighma sseighma  73M Apr  4 10:44 rest-service-demo.~
 ```
 
-Our native image container is now **140 MB** (versus the uncompressed version at **281 MB**):
+Our native image container is now **139 MB** (versus the uncompressed version at **190 MB**):
 
 ```
 $ docker images
