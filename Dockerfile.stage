@@ -20,14 +20,11 @@ EXPOSE 8080
 # For Maven build
 COPY --from=graalvm /home/app/restservice/target/rest-service-demo rest-service-demo
 
-<<<<<<< HEAD
 # # For Gradle build
 # COPY --from=graalvm build/native/nativeCompile/rest-service-demo rest-service-demo
 
 ENTRYPOINT ["/rest-service-demo"]
 
-=======
->>>>>>> 0e7d805412007cd7c6214a33f2a070e1fbc0fee1
 # Build and run:
 # docker build -f ./Dockerfile.stage -t localhost/rest-service-demo:stage .
 # docker run --rm -p 8080:8080 localhost/rest-service-demo:stage
