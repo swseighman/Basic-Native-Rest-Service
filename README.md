@@ -6,7 +6,7 @@ GraalVM Enterprise offers features for accelerating the performance of existing 
 
 In the following examples, we'll explore several options for building and deploying a Spring Boot native application, including:
 
-* Using Java 17
+* Using Java 17 (on Linux)
 * Using Spring Boot Buildpacks support to generate a lightweight container with a native executable
 * Creating your own custom container running a JAR or native executable
 * Using the GraalVM native image Maven and Gradle plugins support to generate a native executable
