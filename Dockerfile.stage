@@ -1,12 +1,9 @@
-FROM container-registry.oracle.com/graalvm/enterprise:latest as graalvm
+FROM container-registry.oracle.com/graalvm/native-image-ee:latest as graalvm
 
 RUN microdnf -y install wget unzip zip findutils tar gcc glibc-devel zlib-devel
 
 COPY . /home/app/restservice
 WORKDIR /home/app/restservice
-
-# Need to download the native-image JAR file from OTN and save it to: src/main/resources  
-COPY src/main/resources/native-image-installable-svm-svmee-java17-linux-amd64-21.3.0.jar /home/app/restservice
 
 RUN \
     # Install SDKMAN
@@ -14,21 +11,20 @@ RUN \
     source "$HOME/.sdkman/bin/sdkman-init.sh"; \
     # Install Maven
     sdk install maven; \
-    gu install -L native-image-installable-svm-svmee-java17-linux-amd64-21.3.0.jar;
+    mvn -Pnative -DskipTests package
 
-RUN source "$HOME/.sdkman/bin/sdkman-init.sh" \
-    && mvn --version \
-    && native-image --version \
-    && mvn -Pnative -DskipTests package
-
-#FROM frolvlad/alpine-glibc
 FROM container-registry.oracle.com/os/oraclelinux:8-slim
 
 EXPOSE 8080
+
+# For Maven build
 COPY --from=graalvm /home/app/restservice/target/rest-service-demo rest-service-demo
+
+# # For Gradle build
+# COPY --from=graalvm build/native/nativeCompile/rest-service-demo rest-service-demo
+
 ENTRYPOINT ["/rest-service-demo"]
 
-
 # Build and run:
-# docker build -f ./Dockerfile.stage -t localhost/rest-service-demo:stage
+# docker build -f ./Dockerfile.stage -t localhost/rest-service-demo:stage .
 # docker run --rm -p 8080:8080 localhost/rest-service-demo:stage

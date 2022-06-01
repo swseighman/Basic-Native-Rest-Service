@@ -164,6 +164,12 @@ Browse to `localhost:8080/greeting`, where you should see:
 
 Or `curl http://localhost:8080/greeting`.
 
+
+>If you're using **Gradle**, execute the following command to build the application:
+>```
+>./gradlew build
+>```
+
 We can build a standalone native image executable using the `native` profile which we can add to our custom containers later in this lab. Let's build a native executable:
 
 ```
@@ -244,6 +250,11 @@ $ target/rest-service-demo
 2022-04-04 11:27:58.076  INFO 27055 --- [           main] c.e.restservice.RestServiceApplication   : Started RestServiceApplication in 0.03 seconds (JVM running for 0.032)
 ```
 The native executable started in approximately **32 ms**.
+
+>If you're using **Gradle**, execute the following command to build the native image executable:
+>```
+>./gradlew nativeCompile
+>```
 
 #### Native Tests
 
@@ -372,6 +383,24 @@ Test run finished after 63 ms
 [INFO] ------------------------------------------------------------------------
 ```
 
+>If you're using **Gradle**, execute the following command to build the native image executable:
+>```
+>./gradlew nativeTest
+>```
+
+#### Building a Static Native Image
+
+See [instructions](https://docs.oracle.com/en/graalvm/enterprise/22/docs/reference-manual/native-image/StaticImages/) for building and installing the required libraries.
+
+After the process has been completed, copy `$ZLIB_DIR/libz.a` to `$GRAALVM_HOME/lib/static/linux-amd64/musl/`
+
+Also add `x86_64-linux-musl-native/bin/x86_64-linux-musl-gcc` to your PATH.
+
+Then execute:
+```
+mvn package -Pstatic
+```
+
 #### Container Options
 
 Within this repository, there are a few examples of deploying applications in various container environments, from distroless to full OS images.  Choose the appropriate version for your use case and build the images.
@@ -379,7 +408,7 @@ Within this repository, there are a few examples of deploying applications in va
 For example, to build the JAR version:
 
 ```
-$ docker build -f Dockerfile.jvm -t localhost/rest-service-demo:jvm
+$ docker build -f Dockerfile.jvm -t localhost/rest-service-demo:jvm .
 ```
 
 ```
@@ -392,36 +421,25 @@ Browse to `localhost:8080/greeting`, where you should see:
 {"id":1,"content":"Hello, World!"}
 ```
 
-Or, if you're using `podman`:
-
-```
-$ buildah bud -f Dockerfile.jvm -t localhost/rest-service-demo:jvm
-```
-
-```
-$ podman run -i --rm -p 8080:8080 localhost/rest-service-demo:jvm
-```
-
-Browse to `localhost:8080/greeting`, where you should see:
-
-```
-{"id":1,"content":"Hello, World!"}
-```
 You can repeat these steps for each container option:
 
 * Dockerfile.jvm
 * Dockerfile.native
 * Dockerfile.stage
 * Dockerfile.distroless
+* Dockerfile.static (x64 Linux only)
+
+There is also a `build-containers.sh` script provided to build the container images.
 
 Of course, you'll need to change the tag (`-t`) to reflect the different container images.
 
 ```
 $ docker images
-localhost/rest-service-demo                       distroless       a3b1cc5886b8  3 days ago    119 MB
-localhost/rest-service-demo                       native           2b0698c7b409  3 days ago    281 MB
-localhost/rest-service-demo                       jvm              c1f07f1e563e  3 days ago    691 MB
-localhost/rest-service-demo                       stage            dbae9b9333a7  3 days ago    281 MB
+localhost/rest-service-demo         distroless       a3b1cc5886b8  3 days ago     49 MB
+localhost/rest-service-demo         native           2b0698c7b409  3 days ago    190 MB
+localhost/rest-service-demo         jvm              c1f07f1e563e  3 days ago    605 MB
+localhost/rest-service-demo         stage            dbae9b9333a7  3 days ago    190 MB
+localhost/rest-service-demo         static           83bdf628adcd  3 days ago     76 MB
 ```
 
 Also, you can choose to compress the native image executable using the [upx](https://upx.github.io/) utility which will reduce your container size but have little impact on startup performance.
@@ -447,7 +465,6 @@ Using `upx` we reduced the native image executable size by ~31% (from **81 M** t
 ```
 
 Our native image container is now **140 MB** (versus the uncompressed version at **281 MB**):
-
 
 ```
 $ docker images
