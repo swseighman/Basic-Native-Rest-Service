@@ -395,5 +395,5 @@ Our native image container is now **139 MB** (versus the uncompressed version at
 
 ```
 $ docker images
-localhost/rest-service-demo                       native           ff77aee72e96  8 seconds ago  140 MB
+localhost/rest-service-demo            native           ff77aee72e96  8 seconds ago  139 MB
 ```
