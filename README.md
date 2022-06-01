@@ -177,6 +177,7 @@ Browse to `localhost:8080/greeting`, where you should see:
 
 Or `curl http://localhost:8080/greeting`.
 
+#### Building a Native Image Executable
 
 We can build a standalone native image executable using the `native` profile which we can add to our custom containers later in this lab. Let's build a native executable:
 
