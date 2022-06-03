@@ -13,15 +13,12 @@ plugins {
 }
 
 repositories {
-    mavenLocal()
-    maven {
-        url = uri('https://repo.spring.io/release')
-    }
+	mavenLocal()
+	maven { url 'https://repo.spring.io/release' }
+	maven { url 'https://repo.spring.io/milestone' }
+	maven { url 'https://repo.spring.io/snapshot' }
 	mavenCentral()
-	gradlePluginPortal()
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
+    gradlePluginPortal()
 }
 
 dependencies {

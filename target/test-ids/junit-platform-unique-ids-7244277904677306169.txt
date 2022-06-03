@@ -1,0 +1,2 @@
+[engine:junit-jupiter]/[class:com.example.restservice.GreetingControllerTests]/[method:noParamGreetingShouldReturnDefaultMessage()]
+[engine:junit-jupiter]/[class:com.example.restservice.GreetingControllerTests]/[method:paramGreetingShouldReturnTailoredMessage()]
