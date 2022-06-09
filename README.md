@@ -8,8 +8,8 @@ In the following examples, we'll explore several options for building and deploy
 
 * Using Java 17 (on Linux)
 * Using Spring Boot Buildpacks support to generate a lightweight container with a native executable
-* Creating your own custom container running a JAR or native executable
-* Using the GraalVM native image Maven and Gradle plugins support to generate a native executable
+* Using the GraalVM native image Maven and Gradle plugins to generate a native executable
+* Creating your own custom containers running a JAR or native executable
 
 Let's begin by cloning the demo repository:
 
@@ -38,9 +38,8 @@ mvn package
 >./gradlew build
 >```
 
+#### Create a Container Using Buildpacks
 Let's build a container with a JAR version of the REST service.  The following command will use **Spring Boot’s Cloud Native Buildpacks** support to create a JAR-based application in a container.
-
->**NOTE:** You'll need to install `docker` or `podman` to create the containers.
 
 ```
 $ mvn spring-boot:build-image
@@ -67,7 +66,7 @@ $ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
 
 The container/app started in approximately **2800ms**.
 
-If you want to create a **native executable** in a container using `Buildpacks`, add the following to your `pom.xml`:
+To create a **native executable** container, uncomment the `Buildpacks` **configuration** section in the `pom.xml`:
 
 ```
 <plugin>
@@ -75,7 +74,7 @@ If you want to create a **native executable** in a container using `Buildpacks`,
     <artifactId>spring-boot-maven-plugin</artifactId>
     <configuration>
         <image>
-            <builder>paketobuildpacks/builder:tiny</builder>
+            <builder>paketobuildpacks/java-native-image@5.12.0</builder>
             <env>
                 <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
             </env>
@@ -83,23 +82,18 @@ If you want to create a **native executable** in a container using `Buildpacks`,
     </configuration>
 </plugin>
 ```
-Then execute the same command:
+To build the native image executable container, execute the command:
 
 ```
 $ mvn spring-boot:build-image
 ... <snip>
-[INFO]     [creator]     *** Images (edbdf0ed8de1):
-[INFO]     [creator]           docker.io/library/rest-service-demo:0.0.1-SNAPSHOT
-[INFO]     [creator]     Adding cache layer 'paketo-buildpacks/graalvm:jdk'
-[INFO]     [creator]     Adding cache layer 'paketo-buildpacks/native-image:native-image'
-[INFO]
 [INFO] Successfully built image 'docker.io/library/rest-service-demo:0.0.1-SNAPSHOT'
 [INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  04:02 min
-[INFO] Finished at: 2021-08-31T22:47:28-04:00
+[INFO] Total time:  01:44 min
+[INFO] Finished at: 2022-06-07T09:06:36-04:00
 [INFO] ------------------------------------------------------------------------
 ```
 
@@ -117,6 +111,8 @@ $ docker run --rm -p 8080:8080 rest-service-demo:0.0.1-SNAPSHOT
 ```
 
 The native executable container/app started in approximately **85ms**.
+
+#### Using `docker-compose`
 
 If you prefer `docker-compose`, you can create a `docker-compose.yml` at the root of the project with the following content:
 
