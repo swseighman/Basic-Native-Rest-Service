@@ -1,4 +1,0 @@
-#
-#Fri Jun 03 08:21:22 EDT 2022
-com.example.restservice.GreetingController=org.springframework.stereotype.Component
-com.example.restservice.RestServiceApplication=org.springframework.stereotype.Component,org.springframework.boot.SpringBootConfiguration
