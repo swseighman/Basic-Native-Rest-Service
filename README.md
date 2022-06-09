@@ -73,13 +73,13 @@ To create a **native executable** container, uncomment the `Buildpacks` **config
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-maven-plugin</artifactId>
     <configuration>
-        <image>
-            <builder>paketobuildpacks/java-native-image@5.12.0</builder>
-            <env>
-                <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-            </env>
-        </image>
-    </configuration>
+		<image>
+		    <builder>paketobuildpacks/builder:tiny</builder>
+			<env>
+			    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+			</env>
+		</image>
+	</configuration>
 </plugin>
 ```
 To build the native image executable container, execute the command:
